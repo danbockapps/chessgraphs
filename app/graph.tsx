@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import { FC } from "react";
+import {FC} from 'react'
 
 const Graph: FC = () => {
-  return <div>Graph</div>;
-};
+  return <div>Graph</div>
+}
 
-export default Graph;
+export default Graph
