@@ -3,14 +3,22 @@
 import {FC, useState} from 'react'
 import Button from './button'
 
+type Datapoint = {
+  id: string
+  clock: {initial: number; increment: number}
+  lastMoveAt: number
+  // There are more fields but I'm only interested in these
+}
+
 const Graph: FC = () => {
   const [username, setUsername] = useState('')
+  const [datapoints, setDatapoints] = useState<Datapoint[]>([])
+  console.log(datapoints)
 
   const onClick = async () => {
-    const onMessage = (obj: any) => console.log(obj)
+    const onMessage = (obj: Datapoint) => setDatapoints((d) => [...d, obj])
     const onComplete = () => console.log('The stream has completed')
 
-    // Date one year ago
     const oneWeekAgo = new Date()
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 2)
 
