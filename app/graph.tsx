@@ -3,6 +3,7 @@
 import {FC, useState} from 'react'
 import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from 'recharts'
 import Button from './button'
+import generateColors from './generateColors'
 import readStream from './readStream'
 
 export type Datapoint = {
@@ -18,10 +19,12 @@ const Graph: FC = () => {
 
   const dataObj = datapoints.reduce(
     (acc, cur) => {
+      if (!cur.clock) return acc
+
       const date = new Date(cur.lastMoveAt)
       const month = date.getMonth()
       const year = date.getFullYear()
-      const bucket = `${year}/${month + 1}`
+      const bucket = `${year}/${month < 9 ? '0' : ''}${month + 1}`
       const category = getReadableTimeControl(cur.clock)
 
       return {
@@ -32,12 +35,16 @@ const Graph: FC = () => {
     {} as Record<string, Record<string, number>>,
   )
 
-  const dataArray = Object.entries(dataObj).map(([month, obj]) => ({month, ...obj}))
+  const dataArray = Object.entries(dataObj)
+    .map(([month, obj]) => ({month, ...obj}))
+    .sort((a, b) => (a.month < b.month ? -1 : 1))
 
   const categories = dataArray.reduce((acc, cur) => {
     const keys = Object.keys(cur).filter((key) => key !== 'month' && !acc.includes(key))
     return [...acc, ...keys]
   }, [] as string[])
+
+  const colors = generateColors(categories.length)
 
   return (
     <div>
@@ -54,8 +61,9 @@ const Graph: FC = () => {
         <YAxis />
         <Tooltip />
         <Legend />
-        {categories.map((category) => (
-          <Line key={category} type="monotone" dataKey={category} />
+
+        {categories.map((category, i) => (
+          <Line key={category} type="monotone" dataKey={category} stroke={colors[i]} />
         ))}
       </LineChart>
     </div>
@@ -63,7 +71,8 @@ const Graph: FC = () => {
 }
 
 const getReadableTimeControl = (clock: {initial: number; increment: number}) => {
-  const minutes = Math.floor(clock.initial / 60)
+  if (!clock.initial) console.log('clock.initial is undefined', {clock})
+  const minutes = Math.floor((clock.initial || 0) / 60)
   return `${minutes} + ${clock.increment}`
 }
 

@@ -2,7 +2,6 @@ import {LICHESS_TOKEN} from '@/env'
 import {Datapoint} from './graph'
 
 const readStream = async (onMessage: (obj: Datapoint) => void) => {
-  // const onMessage = (obj: Datapoint) => setDatapoints((d) => [...d, obj])
   console.time('Stream duration')
   const onComplete = () => console.log('The stream has completed')
 
