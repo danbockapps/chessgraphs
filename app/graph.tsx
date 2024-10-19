@@ -17,8 +17,13 @@ export type Datapoint = {
 const Graph: FC = () => {
   const [username, setUsername] = useState('')
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
-  const {read} = useStream((newItems) => setDatapoints((d) => [...d, ...newItems]), 1000)
   const dataArray = getDataArray(datapoints)
+
+  const {read} = useStream({
+    onMessage: (newItems) => setDatapoints((d) => [...d, ...newItems]),
+    throttleMs: 1000,
+    username,
+  })
 
   const categories = dataArray.reduce((acc, cur) => {
     const keys = Object.keys(cur).filter((key) => key !== 'month' && !acc.includes(key))
@@ -30,23 +35,35 @@ const Graph: FC = () => {
   return (
     <div>
       <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-      <Button onClick={read}>Search</Button>
-      <LineChart
-        width={900}
-        height={600}
-        data={dataArray}
-        margin={{top: 5, right: 30, left: 20, bottom: 5}}
+      <Button
+        onClick={() => {
+          setDatapoints([])
+          read()
+        }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="month" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
+        Search
+      </Button>
 
-        {categories.map((category, i) => (
-          <Line key={category} type="monotone" dataKey={category} stroke={colors[i]} />
-        ))}
-      </LineChart>
+      {dataArray.length > 0 ? (
+        <LineChart
+          width={900}
+          height={600}
+          data={dataArray}
+          margin={{top: 5, right: 30, left: 20, bottom: 5}}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+
+          {categories.map((category, i) => (
+            <Line key={category} type="monotone" dataKey={category} stroke={colors[i]} />
+          ))}
+        </LineChart>
+      ) : (
+        <div> No data to display</div>
+      )}
     </div>
   )
 }

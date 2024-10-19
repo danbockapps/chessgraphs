@@ -2,7 +2,13 @@ import {LICHESS_TOKEN} from '@/env'
 import {Datapoint} from './graph'
 import {useRef} from 'react'
 
-const useStream = (onMessage: (newItems: Datapoint[]) => void, throttleMs: number) => {
+interface Props {
+  onMessage: (newItems: Datapoint[]) => void
+  throttleMs: number
+  username: string
+}
+
+const useStream = ({onMessage, throttleMs, username}: Props) => {
   const queue = useRef<Datapoint[]>([])
 
   const read = async () => {
@@ -17,11 +23,11 @@ const useStream = (onMessage: (newItems: Datapoint[]) => void, throttleMs: numbe
     }, throttleMs)
 
     const start = new Date()
-    start.setDate(start.getDate() - 180) // It handles month transitions automatically
+    start.setDate(start.getDate() - 4 * 365) // It handles month transitions automatically
     start.setDate(1) // Set it to the beginning of the month
 
     const response = await fetch(
-      `https://lichess.org/api/games/user/danbock?${new URLSearchParams({
+      `https://lichess.org/api/games/user/${username}?${new URLSearchParams({
         since: `${start?.getTime() ?? ''}`,
         moves: 'false',
       })}`,
