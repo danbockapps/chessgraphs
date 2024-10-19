@@ -1,7 +1,16 @@
 'use client'
 
 import {FC, useState} from 'react'
-import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from 'recharts'
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import Button from './button'
 import generateColors from './generateColors'
 import getDataArray from './getDataArray'
@@ -45,22 +54,19 @@ const Graph: FC = () => {
       </Button>
 
       {dataArray.length > 0 ? (
-        <LineChart
-          width={900}
-          height={600}
-          data={dataArray}
-          margin={{top: 5, right: 30, left: 20, bottom: 5}}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
+        <ResponsiveContainer width="100%" height={600}>
+          <LineChart data={dataArray}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
 
-          {categories.map((category, i) => (
-            <Line key={category} type="monotone" dataKey={category} stroke={colors[i]} />
-          ))}
-        </LineChart>
+            {categories.map((category, i) => (
+              <Line key={category} type="monotone" dataKey={category} stroke={colors[i]} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
       ) : (
         <div> No data to display</div>
       )}
