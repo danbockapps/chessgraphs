@@ -12,8 +12,8 @@ import {
   YAxis,
 } from 'recharts'
 import Button from './button'
-import generateColors from './generateColors'
 import getDataArray from './getDataArray'
+import useColors from './useColors'
 import useStream from './useStream'
 
 export type Datapoint = {
@@ -26,6 +26,7 @@ export type Datapoint = {
 const Graph: FC = () => {
   const [username, setUsername] = useState('')
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
+  const {getColor, clearColors} = useColors()
   const dataArray = getDataArray(datapoints)
 
   const {read} = useStream({
@@ -39,14 +40,13 @@ const Graph: FC = () => {
     return [...acc, ...keys]
   }, [] as string[])
 
-  const colors = generateColors(categories.length)
-
   return (
     <div>
       <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
       <Button
         onClick={() => {
           setDatapoints([])
+          clearColors()
           read()
         }}
       >
@@ -62,8 +62,8 @@ const Graph: FC = () => {
             <Tooltip />
             <Legend />
 
-            {categories.map((category, i) => (
-              <Line key={category} type="monotone" dataKey={category} stroke={colors[i]} />
+            {categories.map((category) => (
+              <Line key={category} type="monotone" dataKey={category} stroke={getColor(category)} />
             ))}
           </LineChart>
         </ResponsiveContainer>
