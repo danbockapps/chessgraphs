@@ -5,7 +5,7 @@ import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from 'rec
 import Button from './button'
 import generateColors from './generateColors'
 import getDataArray from './getDataArray'
-import readStream from './readStream'
+import useStream from './useStream'
 
 export type Datapoint = {
   id: string
@@ -17,6 +17,7 @@ export type Datapoint = {
 const Graph: FC = () => {
   const [username, setUsername] = useState('')
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
+  const {read} = useStream((newItems) => setDatapoints((d) => [...d, ...newItems]), 1000)
   const dataArray = getDataArray(datapoints)
 
   const categories = dataArray.reduce((acc, cur) => {
@@ -29,7 +30,7 @@ const Graph: FC = () => {
   return (
     <div>
       <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-      <Button onClick={() => readStream((obj) => setDatapoints((d) => [...d, obj]))}>Search</Button>
+      <Button onClick={read}>Search</Button>
       <LineChart
         width={900}
         height={600}
