@@ -1,7 +1,9 @@
+import {LICHESS_TOKEN} from '@/env'
 import {Datapoint} from './graph'
 
 const readStream = async (onMessage: (obj: Datapoint) => void) => {
   // const onMessage = (obj: Datapoint) => setDatapoints((d) => [...d, obj])
+  console.time('Stream duration')
   const onComplete = () => console.log('The stream has completed')
 
   const start = new Date()
@@ -13,7 +15,7 @@ const readStream = async (onMessage: (obj: Datapoint) => void) => {
       since: `${start?.getTime() ?? ''}`,
       moves: 'false',
     })}`,
-    {headers: {Accept: 'application/x-ndjson'}},
+    {headers: {Accept: 'application/x-ndjson', Authorization: 'Bearer ' + LICHESS_TOKEN}},
   )
 
   if (response.body) {
@@ -37,6 +39,7 @@ const readStream = async (onMessage: (obj: Datapoint) => void) => {
     }
 
     onComplete()
+    console.timeEnd('Stream duration')
   }
 }
 

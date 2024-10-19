@@ -16,7 +16,7 @@ const Graph: FC = () => {
   const [username, setUsername] = useState('')
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
 
-  const data = datapoints.reduce(
+  const dataObj = datapoints.reduce(
     (acc, cur) => {
       const date = new Date(cur.lastMoveAt)
       const month = date.getMonth()
@@ -32,25 +32,31 @@ const Graph: FC = () => {
     {} as Record<string, Record<string, number>>,
   )
 
-  console.log(data)
+  const dataArray = Object.entries(dataObj).map(([month, obj]) => ({month, ...obj}))
+
+  const categories = dataArray.reduce((acc, cur) => {
+    const keys = Object.keys(cur).filter((key) => key !== 'month' && !acc.includes(key))
+    return [...acc, ...keys]
+  }, [] as string[])
 
   return (
     <div>
       <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
       <Button onClick={() => readStream((obj) => setDatapoints((d) => [...d, obj]))}>Search</Button>
       <LineChart
-        width={500}
-        height={300}
-        data={Object.entries(data).map(([name, obj]) => ({name, ...obj}))}
+        width={900}
+        height={600}
+        data={dataArray}
         margin={{top: 5, right: 30, left: 20, bottom: 5}}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis dataKey="month" />
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="5 + 3" />
-        <Line type="monotone" dataKey="30 + 20" />
+        {categories.map((category) => (
+          <Line key={category} type="monotone" dataKey={category} />
+        ))}
       </LineChart>
     </div>
   )
