@@ -1,6 +1,6 @@
 'use client'
 
-import {FC, useState} from 'react'
+import {FC} from 'react'
 import {
   CartesianGrid,
   Legend,
@@ -11,10 +11,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import Button from './button'
 import getDataArray from './getDataArray'
-import useColors from './useColors'
-import useStream from './useStream'
+
+interface Props {
+  datapoints: Datapoint[]
+  getColor: (key: string) => string
+}
 
 export type Datapoint = {
   id: string
@@ -23,17 +25,8 @@ export type Datapoint = {
   // There are more fields but I'm only interested in these
 }
 
-const Graph: FC = () => {
-  const [username, setUsername] = useState('')
-  const [datapoints, setDatapoints] = useState<Datapoint[]>([])
-  const {getColor, clearColors} = useColors()
-  const dataArray = getDataArray(datapoints)
-
-  const {read} = useStream({
-    onMessage: (newItems) => setDatapoints((d) => [...d, ...newItems]),
-    throttleMs: 1000,
-    username,
-  })
+const Graph: FC<Props> = (props) => {
+  const dataArray = getDataArray(props.datapoints)
 
   const categories = dataArray.reduce((acc, cur) => {
     const keys = Object.keys(cur).filter((key) => key !== 'month' && !acc.includes(key))
@@ -42,17 +35,6 @@ const Graph: FC = () => {
 
   return (
     <div>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-      <Button
-        onClick={() => {
-          setDatapoints([])
-          clearColors()
-          read()
-        }}
-      >
-        Search
-      </Button>
-
       {dataArray.length > 0 ? (
         <ResponsiveContainer width="100%" height={600}>
           <LineChart data={dataArray}>
@@ -63,7 +45,12 @@ const Graph: FC = () => {
             <Legend />
 
             {categories.map((category) => (
-              <Line key={category} type="monotone" dataKey={category} stroke={getColor(category)} />
+              <Line
+                key={category}
+                type="monotone"
+                dataKey={category}
+                stroke={props.getColor(category)}
+              />
             ))}
           </LineChart>
         </ResponsiveContainer>

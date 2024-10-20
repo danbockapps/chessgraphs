@@ -1,5 +1,5 @@
-import Graph from './graph'
+import Main from './main'
 
 export default function Home() {
-  return <Graph />
+  return <Main />
 }
