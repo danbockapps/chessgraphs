@@ -3,12 +3,14 @@
 import {FC, useState} from 'react'
 import Button from './button'
 import Graph, {Datapoint} from './graph'
+import Switch from './switch'
 import useColors from './useColors'
 import useStream from './useStream'
 
 const Main: FC = () => {
   const [username, setUsername] = useState('')
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
+  const [graphY, setGraphY] = useState<'time' | 'numGames'>('time')
 
   const {getColor, clearColors} = useColors()
 
@@ -30,8 +32,13 @@ const Main: FC = () => {
       >
         Search
       </Button>
-
-      <Graph {...{datapoints, getColor}} />
+      Hours spent
+      <Switch
+        isOn={graphY === 'numGames'}
+        handleToggle={() => setGraphY(graphY === 'numGames' ? 'time' : 'numGames')}
+      />
+      Number of games
+      <Graph {...{datapoints, getColor, graphY}} />
     </div>
   )
 }

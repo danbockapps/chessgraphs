@@ -16,22 +16,19 @@ import getDataArray from './getDataArray'
 interface Props {
   datapoints: Datapoint[]
   getColor: (key: string) => string
+  graphY: 'time' | 'numGames'
 }
 
 export type Datapoint = {
   id: string
   clock: {initial: number; increment: number}
+  createdAt: number
   lastMoveAt: number
   // There are more fields but I'm only interested in these
 }
 
 const Graph: FC<Props> = (props) => {
-  const dataArray = getDataArray(props.datapoints)
-
-  const categories = dataArray.reduce((acc, cur) => {
-    const keys = Object.keys(cur).filter((key) => key !== 'month' && !acc.includes(key))
-    return [...acc, ...keys]
-  }, [] as string[])
+  const {categories, dataArray} = getDataArray(props.datapoints, props.graphY)
 
   return (
     <div>

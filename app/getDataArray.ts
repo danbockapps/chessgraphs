@@ -1,6 +1,6 @@
 import {Datapoint} from './graph'
 
-const getDataArray = (datapoints: Datapoint[]) => {
+const getDataArray = (datapoints: Datapoint[], graphY: 'time' | 'numGames') => {
   const dataObj = datapoints.reduce(
     (acc, cur) => {
       if (!cur.clock) return acc
@@ -10,10 +10,11 @@ const getDataArray = (datapoints: Datapoint[]) => {
       const year = date.getFullYear()
       const bucket = `${year}/${month < 9 ? '0' : ''}${month + 1}`
       const category = getReadableTimeControl(cur.clock)
+      const value = graphY === 'time' ? (cur.lastMoveAt - cur.createdAt) / 3600000 : 1
 
       return {
         ...acc,
-        [bucket]: {...(acc[bucket] ?? {}), [category]: (acc[bucket]?.[category] ?? 0) + 1},
+        [bucket]: {...(acc[bucket] ?? {}), [category]: (acc[bucket]?.[category] ?? 0) + value},
       }
     },
     {} as Record<string, Record<string, number>>,
