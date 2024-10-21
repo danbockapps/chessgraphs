@@ -29,19 +29,22 @@ const Main: FC<UsernameProps> = (usernames) => {
 
   return (
     <>
-      <div className="flex gap-3 m-4 md:m-6">
-        <Link href="/" className="text-xl flex-1">
+      <div className="grid grid-cols-2 m-4 gap-4 md:flex md:m-6">
+        <Link href="/" className="col-span-1 text-xl md:flex-1">
           🔙
         </Link>
-        <div className="flex-1">
+        <div className="col-span-1 justify-self-end md:flex-1">
           <Button onClick={shuffleColors}>Shuffle colors</Button>
         </div>
-        Hours spent
-        <Switch
-          isOn={graphY === 'numGames'}
-          handleToggle={() => setGraphY(graphY === 'numGames' ? 'time' : 'numGames')}
-        />
-        Number of games
+
+        <div className="col-span-2 justify-self-center flex gap-3">
+          Hours spent
+          <Switch
+            isOn={graphY === 'numGames'}
+            handleToggle={() => setGraphY(graphY === 'numGames' ? 'time' : 'numGames')}
+          />
+          Number of games
+        </div>
       </div>
       <Graph {...{datapoints, getColor, graphY}} />
     </>
