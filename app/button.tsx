@@ -9,8 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const filledClasses = 'bg-blue-500 text-white hover:bg-blue-700'
-const outlinedClasses =
-  'bg-white border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white'
+const outlinedClasses = 'bg-white border border-blue-500 text-blue-500'
 
 const Button: React.FC<ButtonProps> = ({
   children,

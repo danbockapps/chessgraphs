@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import {FC, useEffect, useState} from 'react'
+import Button from './button'
 import Graph, {Datapoint} from './graph'
 import Switch from './switch'
 import useColors from './useColors'
@@ -12,8 +13,7 @@ export type UsernameProps = {lichess: string; chesscom: string}
 const Main: FC<UsernameProps> = (usernames) => {
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
   const [graphY, setGraphY] = useState<'time' | 'numGames'>('time')
-
-  const {getColor} = useColors()
+  const {getColor, shuffleColors} = useColors()
 
   const {read} = useStream({
     onMessage: (newItems) => setDatapoints((d) => [...d, ...newItems]),
@@ -21,9 +21,11 @@ const Main: FC<UsernameProps> = (usernames) => {
     username: usernames.lichess,
   })
 
+  const datapointsExist = datapoints.length > 0
+
   useEffect(() => {
-    read()
-  }, [read])
+    if (!datapointsExist) read()
+  }, [read, datapointsExist])
 
   return (
     <>
@@ -31,6 +33,9 @@ const Main: FC<UsernameProps> = (usernames) => {
         <Link href="/" className="text-xl flex-1">
           🔙
         </Link>
+        <div className="flex-1">
+          <Button onClick={shuffleColors}>Shuffle colors</Button>
+        </div>
         Hours spent
         <Switch
           isOn={graphY === 'numGames'}

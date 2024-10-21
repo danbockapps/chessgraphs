@@ -15,7 +15,24 @@ const useColors = () => {
     }
   }
 
-  return {getColor}
+  const shuffleColors = () =>
+    setColors(
+      shuffleArray(Object.values(colors)).reduce(
+        (acc, cur, index) => ({...acc, [Object.keys(colors)[index]]: cur}),
+        {},
+      ),
+    )
+
+  return {getColor, shuffleColors}
+}
+
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffledArray = [...array]
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]
+  }
+  return shuffledArray
 }
 
 const stringify = (color: Color) => `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`
