@@ -26,16 +26,20 @@ const Main: FC<UsernameProps> = (usernames) => {
   }, [read])
 
   return (
-    <div>
-      <Link href="/">Back</Link>
-      Hours spent
-      <Switch
-        isOn={graphY === 'numGames'}
-        handleToggle={() => setGraphY(graphY === 'numGames' ? 'time' : 'numGames')}
-      />
-      Number of games
+    <>
+      <div className="flex gap-3 m-4 md:m-6">
+        <Link href="/" className="text-xl flex-1">
+          🔙
+        </Link>
+        Hours spent
+        <Switch
+          isOn={graphY === 'numGames'}
+          handleToggle={() => setGraphY(graphY === 'numGames' ? 'time' : 'numGames')}
+        />
+        Number of games
+      </div>
       <Graph {...{datapoints, getColor, graphY}} />
-    </div>
+    </>
   )
 }
 
