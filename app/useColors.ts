@@ -15,9 +15,7 @@ const useColors = () => {
     }
   }
 
-  const clearColors = () => setColors({})
-
-  return {getColor, clearColors}
+  return {getColor}
 }
 
 const stringify = (color: Color) => `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`

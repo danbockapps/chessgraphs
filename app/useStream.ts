@@ -1,6 +1,6 @@
 import {LICHESS_TOKEN} from '@/env'
 import {Datapoint} from './graph'
-import {useRef} from 'react'
+import {useCallback, useRef} from 'react'
 
 interface Props {
   onMessage: (newItems: Datapoint[]) => void
@@ -11,7 +11,7 @@ interface Props {
 const useStream = ({onMessage, throttleMs, username}: Props) => {
   const queue = useRef<Datapoint[]>([])
 
-  const read = async () => {
+  const read = useCallback(async () => {
     console.time('Stream duration')
     queue.current = []
 
@@ -23,7 +23,7 @@ const useStream = ({onMessage, throttleMs, username}: Props) => {
     }, throttleMs)
 
     const start = new Date()
-    start.setDate(start.getDate() - 30) // It handles month transitions automatically
+    start.setDate(start.getDate() - 7 * 30) // It handles month transitions automatically
     start.setDate(1) // Set it to the beginning of the month
 
     const response = await fetch(
@@ -31,7 +31,12 @@ const useStream = ({onMessage, throttleMs, username}: Props) => {
         since: `${start?.getTime() ?? ''}`,
         moves: 'false',
       })}`,
-      {headers: {Accept: 'application/x-ndjson', Authorization: 'Bearer ' + LICHESS_TOKEN}},
+      {
+        headers: {
+          Accept: 'application/x-ndjson',
+          // Authorization: 'Bearer ' + LICHESS_TOKEN,
+        },
+      },
     )
 
     if (response.body) {
@@ -57,7 +62,7 @@ const useStream = ({onMessage, throttleMs, username}: Props) => {
       onComplete()
       console.timeEnd('Stream duration')
     }
-  }
+  }, [])
 
   return {read}
 }
