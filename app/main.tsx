@@ -8,12 +8,15 @@ import Graph, {Datapoint} from './graph'
 import Switch from './switch'
 import useColors from './useColors'
 import useStream from './useStream'
+import {Spinner} from './spinner'
 
 export type SearchParams = {lichess: string; chesscom: string; years: string}
 
 const Main: FC<SearchParams> = (searchParams) => {
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
   const [graphY, setGraphY] = useState<'time' | 'numGames'>('time')
+  const [lichessLoading, setLichessLoading] = useState(false)
+  const [chesscomLoading, setChesscomLoading] = useState(false)
   const {getColor, shuffleColors} = useColors()
 
   const {read} = useStream({
@@ -21,12 +24,14 @@ const Main: FC<SearchParams> = (searchParams) => {
     throttleMs: 1000,
     username: searchParams.lichess,
     years: Number(searchParams.years),
+    setLoading: setLichessLoading,
   })
 
   const {loadGames} = useChesscomGames({
     username: searchParams.chesscom,
     years: Number(searchParams.years),
     onReceive: (newItems) => setDatapoints((d) => [...d, ...newItems]),
+    setLoading: setChesscomLoading,
   })
 
   const datapointsExist = datapoints.length > 0
@@ -41,16 +46,21 @@ const Main: FC<SearchParams> = (searchParams) => {
 
   return (
     <>
-      <div className="grid grid-cols-2 m-4 gap-4 md:flex md:m-6">
+      <div className="grid m-4 gap-4 md:flex md:items-center md:m-6">
         <Link href="/" className="col-span-1 text-xl md:flex-1">
           🔙
         </Link>
 
-        <div className="col-span-1 justify-self-end md:flex-1">
+        <div className="flex gap-1 items-center md:whitespace-nowrap md:flex-1">
+          Loaded games: {datapoints.length}
+          {lichessLoading || chesscomLoading ? <Spinner className="text-black" /> : null}
+        </div>
+
+        <div className="justify-self-end md:flex-1">
           <Button onClick={shuffleColors}>Shuffle colors</Button>
         </div>
 
-        <div className="col-span-2 justify-self-center flex gap-3">
+        <div className="col-span-3 justify-self-center flex gap-3">
           Hours spent
           <Switch
             isOn={graphY === 'numGames'}
@@ -60,7 +70,7 @@ const Main: FC<SearchParams> = (searchParams) => {
         </div>
       </div>
 
-      <Graph {...{datapoints, getColor, graphY}} />
+      {datapoints.length ? <Graph {...{datapoints, getColor, graphY}} /> : null}
     </>
   )
 }

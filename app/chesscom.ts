@@ -1,9 +1,15 @@
 import {Datapoint} from './graph'
 
-type Props = {username: string; years: number; onReceive: (datapoints: Datapoint[]) => void}
+type Props = {
+  username: string
+  years: number
+  onReceive: (datapoints: Datapoint[]) => void
+  setLoading: (loading: boolean) => void
+}
 
-const useChesscomGames = ({username, years, onReceive}: Props) => {
+const useChesscomGames = ({username, years, onReceive, setLoading}: Props) => {
   const loadGames = async () => {
+    setLoading(true)
     console.time('Chess.com duration')
     const res = await fetch(`https://api.chess.com/pub/player/${username}/games/archives`)
     const data = (await res.json()) as {archives: string[]}
@@ -19,7 +25,7 @@ const useChesscomGames = ({username, years, onReceive}: Props) => {
       return yyyy > startYear || (yyyy === startYear && mm >= currentMonth)
     })
 
-    archives.forEach(async (archive) => {
+    const promises = archives.map(async (archive) => {
       const res = await fetch(archive)
       const data = (await res.json()) as {games: Game[]}
       onReceive(
@@ -39,6 +45,9 @@ const useChesscomGames = ({username, years, onReceive}: Props) => {
           }),
       )
     })
+
+    await Promise.all(promises)
+    setLoading(false)
   }
 
   return {loadGames}

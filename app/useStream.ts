@@ -7,12 +7,14 @@ interface Props {
   throttleMs: number
   username: string
   years: number
+  setLoading: (loading: boolean) => void
 }
 
-const useStream = ({onMessage, throttleMs, username, years}: Props) => {
+const useStream = ({onMessage, throttleMs, username, years, setLoading}: Props) => {
   const queue = useRef<Datapoint[]>([])
 
   const read = useCallback(async () => {
+    setLoading(true)
     console.time('Stream duration')
     queue.current = []
 
@@ -20,7 +22,10 @@ const useStream = ({onMessage, throttleMs, username, years}: Props) => {
       if (queue.current.length > 0) {
         onMessage(queue.current)
         queue.current = []
-      } else clearInterval(intervalId)
+      } else {
+        setLoading(false)
+        clearInterval(intervalId)
+      }
     }, throttleMs)
 
     const start = new Date()
