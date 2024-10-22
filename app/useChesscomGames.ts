@@ -1,3 +1,4 @@
+import {useCallback} from 'react'
 import {Datapoint} from './graph'
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
 }
 
 const useChesscomGames = ({username, years, onReceive, setLoading}: Props) => {
-  const loadGames = async () => {
+  const loadGames = useCallback(async () => {
     setLoading(true)
     console.time('Chess.com duration')
     const res = await fetch(`https://api.chess.com/pub/player/${username}/games/archives`)
@@ -48,7 +49,7 @@ const useChesscomGames = ({username, years, onReceive, setLoading}: Props) => {
 
     await Promise.all(promises)
     setLoading(false)
-  }
+  }, [onReceive, setLoading, username, years])
 
   return {loadGames}
 }

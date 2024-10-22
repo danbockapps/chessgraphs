@@ -1,4 +1,3 @@
-import {LICHESS_TOKEN} from '@/env'
 import {Datapoint} from './graph'
 import {useCallback, useRef} from 'react'
 
@@ -68,7 +67,7 @@ const useStream = ({onMessage, throttleMs, username, years, setLoading}: Props) 
       onComplete()
       console.timeEnd('Stream duration')
     }
-  }, [])
+  }, [onMessage, throttleMs, username, years, setLoading])
 
   return {read}
 }

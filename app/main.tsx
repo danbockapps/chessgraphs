@@ -1,14 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import {FC, useEffect, useState} from 'react'
+import {FC, useCallback, useEffect, useState} from 'react'
 import Button from './button'
-import useChesscomGames from './chesscom'
 import Graph, {Datapoint} from './graph'
+import {Spinner} from './spinner'
 import Switch from './switch'
+import useChesscomGames from './useChesscomGames'
 import useColors from './useColors'
 import useStream from './useStream'
-import {Spinner} from './spinner'
 
 export type SearchParams = {lichess: string; chesscom: string; years: string}
 
@@ -19,8 +19,13 @@ const Main: FC<SearchParams> = (searchParams) => {
   const [chesscomLoading, setChesscomLoading] = useState(false)
   const {getColor, shuffleColors} = useColors()
 
+  const onReceive = useCallback(
+    (newItems: Datapoint[]) => setDatapoints((d) => [...d, ...newItems]),
+    [],
+  )
+
   const {read} = useStream({
-    onMessage: (newItems) => setDatapoints((d) => [...d, ...newItems]),
+    onMessage: onReceive,
     throttleMs: 1000,
     username: searchParams.lichess,
     years: Number(searchParams.years),
@@ -30,7 +35,7 @@ const Main: FC<SearchParams> = (searchParams) => {
   const {loadGames} = useChesscomGames({
     username: searchParams.chesscom,
     years: Number(searchParams.years),
-    onReceive: (newItems) => setDatapoints((d) => [...d, ...newItems]),
+    onReceive,
     setLoading: setChesscomLoading,
   })
 
@@ -42,7 +47,7 @@ const Main: FC<SearchParams> = (searchParams) => {
 
   useEffect(() => {
     if (searchParams.chesscom) loadGames()
-  }, [searchParams.chesscom, searchParams.years])
+  }, [searchParams.chesscom, searchParams.years, loadGames])
 
   return (
     <>
