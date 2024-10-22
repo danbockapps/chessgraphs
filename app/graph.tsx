@@ -21,7 +21,7 @@ interface Props {
 
 export type Datapoint = {
   id: string
-  clock: {initial: number; increment: number}
+  clock: {initial: number; increment?: number}
   createdAt: number
   lastMoveAt: number
   // There are more fields but I'm only interested in these

@@ -1,12 +1,12 @@
 import {FC} from 'react'
 import Entry from './entry'
-import Main, {UsernameProps} from './main'
+import Main, {SearchParams} from './main'
 
-type Props = {searchParams: UsernameProps}
+type Props = {searchParams: SearchParams}
 
 const Home: FC<Props> = (props) => {
-  const {lichess, chesscom} = props.searchParams
-  return lichess || chesscom ? <Main {...{lichess, chesscom}} /> : <Entry />
+  const {lichess, chesscom, years} = props.searchParams
+  return lichess || chesscom ? <Main {...{lichess, chesscom, years}} /> : <Entry />
 }
 
 export default Home

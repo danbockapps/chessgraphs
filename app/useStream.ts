@@ -6,9 +6,10 @@ interface Props {
   onMessage: (newItems: Datapoint[]) => void
   throttleMs: number
   username: string
+  years: number
 }
 
-const useStream = ({onMessage, throttleMs, username}: Props) => {
+const useStream = ({onMessage, throttleMs, username, years}: Props) => {
   const queue = useRef<Datapoint[]>([])
 
   const read = useCallback(async () => {
@@ -23,7 +24,7 @@ const useStream = ({onMessage, throttleMs, username}: Props) => {
     }, throttleMs)
 
     const start = new Date()
-    start.setDate(start.getDate() - 3 * 30) // It handles month transitions automatically
+    start.setFullYear(start.getFullYear() - years)
     start.setDate(1) // Set it to the beginning of the month
 
     const response = await fetch(

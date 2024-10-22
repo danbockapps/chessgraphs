@@ -3,14 +3,15 @@
 import Link from 'next/link'
 import {FC, useEffect, useState} from 'react'
 import Button from './button'
+import useChesscomGames from './chesscom'
 import Graph, {Datapoint} from './graph'
 import Switch from './switch'
 import useColors from './useColors'
 import useStream from './useStream'
 
-export type UsernameProps = {lichess: string; chesscom: string}
+export type SearchParams = {lichess: string; chesscom: string; years: string}
 
-const Main: FC<UsernameProps> = (usernames) => {
+const Main: FC<SearchParams> = (searchParams) => {
   const [datapoints, setDatapoints] = useState<Datapoint[]>([])
   const [graphY, setGraphY] = useState<'time' | 'numGames'>('time')
   const {getColor, shuffleColors} = useColors()
@@ -18,14 +19,25 @@ const Main: FC<UsernameProps> = (usernames) => {
   const {read} = useStream({
     onMessage: (newItems) => setDatapoints((d) => [...d, ...newItems]),
     throttleMs: 1000,
-    username: usernames.lichess,
+    username: searchParams.lichess,
+    years: Number(searchParams.years),
+  })
+
+  const {loadGames} = useChesscomGames({
+    username: searchParams.chesscom,
+    years: Number(searchParams.years),
+    onReceive: (newItems) => setDatapoints((d) => [...d, ...newItems]),
   })
 
   const datapointsExist = datapoints.length > 0
 
   useEffect(() => {
-    if (!datapointsExist) read()
-  }, [read, datapointsExist])
+    if (searchParams.lichess && !datapointsExist) read()
+  }, [read, datapointsExist, searchParams.lichess])
+
+  useEffect(() => {
+    if (searchParams.chesscom) loadGames()
+  }, [searchParams.chesscom, searchParams.years])
 
   return (
     <>
@@ -33,6 +45,7 @@ const Main: FC<UsernameProps> = (usernames) => {
         <Link href="/" className="col-span-1 text-xl md:flex-1">
           🔙
         </Link>
+
         <div className="col-span-1 justify-self-end md:flex-1">
           <Button onClick={shuffleColors}>Shuffle colors</Button>
         </div>
@@ -46,6 +59,7 @@ const Main: FC<UsernameProps> = (usernames) => {
           Number of games
         </div>
       </div>
+
       <Graph {...{datapoints, getColor, graphY}} />
     </>
   )

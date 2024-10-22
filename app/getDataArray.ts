@@ -40,9 +40,9 @@ const getDataArray = (datapoints: Datapoint[], graphY: 'time' | 'numGames') => {
   }
 }
 
-const getReadableTimeControl = (clock: {initial: number; increment: number}) => {
+const getReadableTimeControl = (clock: {initial: number; increment?: number}) => {
   const minutes = Math.floor((clock.initial || 0) / 60)
-  return `${minutes} + ${clock.increment}`
+  return `${minutes} + ${clock.increment ?? 0}`
 }
 
 const getAllMonths = (dataObj: Record<string, Record<string, number>>) => {
