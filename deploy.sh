@@ -1,0 +1,1 @@
+docker build . -t ghcr.io/danbockapps/chessgraphs && docker push ghcr.io/danbockapps/chessgraphs
